@@ -28,7 +28,7 @@ describe('Surbtc REST Client Get markets', function() {
     client.getMarkets(function(error, response) {
       assert(error);
       assert(!response);
-      assert.deepEqual(errorFixture(), error.json);
+      assert.deepEqual(errorFixture(), error);
       done();
     });
   });
