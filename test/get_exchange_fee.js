@@ -9,19 +9,10 @@ var types = require('./fixtures/get_exchange_fee').types()
 var markets = require('./fixtures/get_exchange_fee').markets()
 var async = require('async')
 
-var client = new Client({
-  api: 'https://stg.surbtc.com/api/',
-  secret: 'jhgkjhgk'
-})
-client.getExchangeFee(markets[0], types[0], function (error, response) {
-  if (error) console.log(error)
-  else console.log(response)
-})
-
-describe('Surbtc REST Client Get Fee Percentage', function () {
+describe('Surbtc REST Client Get Exchange Fee', function () {
   async.eachSeries(types, function (type, cb) {
     async.eachSeries(markets, function (marketId, callback) {
-      it('should get fee percentage for limit order type ' + type + ' in market ' + marketId, function (done) {
+      it('should get exchange fee for limit order type ' + type + ' in market ' + marketId, function (done) {
         var client = new Client({
           api: 'https://stg.surbtc.com/api/'
         })
@@ -32,10 +23,10 @@ describe('Surbtc REST Client Get Fee Percentage', function () {
           assert.deepEqual(success(response), response)
           done()
         })
-        client = undefined;
+        client = undefined
       })
 
-      it('should get fee percentage for market_order order type ' + type + ' in market ' + marketId, function (done) {
+      it('should get exchange fee for market_order order type ' + type + ' in market ' + marketId, function (done) {
         var client = new Client({
           api: 'https://stg.surbtc.com/api/'
         })
@@ -55,7 +46,7 @@ describe('Surbtc REST Client Get Fee Percentage', function () {
 
   async.eachSeries(types, function (type, cb) {
     async.eachSeries(markets, function (marketId, callback) {
-      it('should fail to get fee percentage for limit order type ' + type + ' in market ' + marketId, function (done) {
+      it('should fail to get exchange fee for limit order type ' + type + ' in market ' + marketId, function (done) {
         var client = new Client({
           api: 'https://stg.surbtc.com/api/',
           secret: 'jhgkjhgk'
