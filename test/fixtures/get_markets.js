@@ -22,7 +22,6 @@ exports.success = function (args) {
 exports.error = function () {
   return {
     success: false,
-    error_type: 'invalid_request',
-    message: 'Not Found'
+    error_type: 'invalid_request'
   }
 }
