@@ -137,4 +137,28 @@ Client.prototype.getReverseQuotation = function (marketId, type, amount, callbac
   })
 }
 
+Client.prototype.createOrder = function (marketId, order, callback) {
+  var url = this.api + 'v1/markets/' + marketId + '/orders'
+
+  if (this.secret !== '') {
+    url += '?api_key=' + this.secret
+  } else {
+    return callback(new Error('InvalidRequest:ApiKeyRequired'))
+  }
+
+  http
+  .post(url)
+  .set({'Accept': 'application/json', 'Content-Type': 'application/json'})
+  .send(order)
+  .end(function (error, response) {
+    if (error) {
+      responseHandler.errorSet(error, error.response.error)
+      return callback(error.json)
+    }
+
+    responseHandler.success(response, response.body)
+    callback(null, response.json)
+  })
+}
+
 module.exports = Client
