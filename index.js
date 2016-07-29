@@ -161,4 +161,75 @@ Client.prototype.createOrder = function (marketId, order, callback) {
   })
 }
 
+Client.prototype._getOrderPages = function (orders, marketId, callback, loopFunction) {
+  var self = this
+
+  // check if there are any more pages
+  var page = _.toNumber(orders.meta.current_page)
+
+  if (orders.success && page < orders.meta.total_pages) {
+    ++page
+
+    self.getOrdersRaw(marketId, page, function (error, response) {
+      if (error) {
+        callback(error, null)
+        return
+      }
+
+      orders.orders = _.concat(orders.orders, response.orders)
+      orders.meta.current_page = page
+
+      loopFunction(orders, marketId, callback, loopFunction)
+    })
+  } else {
+    callback(null, orders)
+  }
+}
+
+Client.prototype.pollOrders = function (orders, marketId, callback) {
+  var self = this
+
+  self._getOrderPages(orders, marketId, callback,
+    self._getOrderPages.bind(this))
+}
+
+Client.prototype.getOrdersRaw = function (marketId, page, callback) {
+  var url = this.api + 'v1/markets/' + marketId + '/orders'
+
+  if (this.secret !== '') {
+    url += '?api_key=' + this.secret
+  } else {
+    return callback(new Error('InvalidRequest:ApiKeyRequired'))
+  }
+
+  if (page) {
+    url += '&page=' + page
+  }
+
+  http
+  .get(url)
+  .set({'Accept': 'application/json', 'Content-Type': 'application/json'})
+  .end(function (error, response) {
+    if (error) {
+      responseHandler.errorSet(error, error.response.error)
+      return callback(error.json)
+    }
+    responseHandler.success(response, response.body)
+    callback(null, response.json)
+  })
+}
+
+Client.prototype.getOrders = function (marketId, callback) {
+  var self = this
+
+  async.waterfall([
+    function (next) {
+      self.getOrdersRaw(marketId, 0, next)
+    },
+    function (orders, next) {
+      self.pollOrders(orders, marketId, next)
+    }
+  ], callback)
+}
+
 module.exports = Client
