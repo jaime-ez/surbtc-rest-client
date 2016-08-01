@@ -30,14 +30,13 @@ This nodejs module connects to surbtc api in order to get quotes and execute ord
     
 #### Get Exchange Fee  
 
-  - marketId: string - required    
-  - type: string - required  
-  - marketOrder: boolean - optional  
-  
+- marketId: string - required    
+- type: string - required  
+- marketOrder: boolean - optional  
 
-    client.getExchangeFee(marketId, type, marketOrder, function(err, res){
-    
-    })
+        client.getExchangeFee(marketId, type, marketOrder, function(err, res){
+
+        })
     
 #### Generate UUID  
 
@@ -47,12 +46,12 @@ This nodejs module connects to surbtc api in order to get quotes and execute ord
     
 #### Get Order Book  
 
-  - marketId: string - required  
+- marketId: string - required  
 
 
-    client.getOrderBook(marketId, function (err, res){
-    
-    })  
+        client.getOrderBook(marketId, function (err, res){
+
+        })  
     
 Response:  
 
@@ -68,14 +67,14 @@ Response:
 
 Total is the number of CLP cents I am willing to give in order to get BTC satoshi's amount  
 
-  - marketId: string - required  
-  - type: string - required  
-  - total: Number - required    
+- marketId: string - required  
+- type: string - required  
+- total: Number - required    
 
 
-    client.getQuotation(marketId, type, total, function(err, res){
-    
-    })  
+        client.getQuotation(marketId, type, total, function(err, res){
+
+        })  
     
 Response: 
 
@@ -94,14 +93,14 @@ Response:
 
 Amount is the number of satoshis I am willing to buy/sell in order to get CLP cents total  
 
-  - marketId: string - required  
-  - type: string - required  
-  - amount: Number - required  
-  
-  
-    client.getReverseQuotation(marketId, type, amount, function(err, res){
-    
-    })
+- marketId: string - required  
+- type: string - required  
+- amount: Number - required  
+
+
+        client.getReverseQuotation(marketId, type, amount, function(err, res){
+
+        })
     
 Response:  
 
@@ -118,20 +117,20 @@ Response:
 
 #### Create Order  
 
-  - marketId: string - required  
-  - order: 
-        order: {
-          type:,
-          limit:,
-          amount:,
-          original_amount:,
-          price_type:
-        }
-  
+- marketId: string - required  
+- order: 
+      order: {
+        type:,
+        limit:,
+        amount:,
+        original_amount:,
+        price_type:
+      }
 
-    client.createOrder(marketId, order, function(err, res){
-    
-    })  
+
+        client.createOrder(marketId, order, function(err, res){
+
+        })  
     
 Response:
 
