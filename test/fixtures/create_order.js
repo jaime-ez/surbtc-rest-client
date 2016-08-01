@@ -14,6 +14,7 @@ exports.success = function (args) {
       market_id: args.order.market_id,
       paid_fee: args.order.paid_fee,
       total_exchanged: args.order.total_exchanged,
+      traded_amount: args.order.traded_amount,
       fee_currency: args.order.fee_currency,
       price_type: args.order.price_type,
       weighted_quotation: args.order.weighted_quotation,
