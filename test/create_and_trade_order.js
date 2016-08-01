@@ -2,6 +2,7 @@
 
 var Client = require('../')
 var assert = require('chai').assert
+var accountSecret = require('./fixtures/account_info').secret()
 var errorFixture = require('./fixtures/create_and_trade_order').error
 var success = require('./fixtures/create_and_trade_order').success
 var orders = require('./fixtures/create_and_trade_order').orders()
@@ -11,9 +12,10 @@ var async = require('async')
 describe('Surbtc REST Client Create and Trade Order', function () {
   async.eachSeries(markets, function (marketId, cb) {
     async.eachSeries(orders, function (order, callback) {
-      it('should create and tarde order ' + JSON.stringify(order) + ' in market ' + marketId, function (done) {
+      it('should create and trade order ' + JSON.stringify(order) + ' in market ' + marketId, function (done) {
         var client = new Client({
-          api: 'https://stg.surbtc.com/api/'
+          api: 'https://stg.surbtc.com/api/',
+          secret: accountSecret
         })
 
         client.createAndTradeOrder(marketId, order, function (error, response) {
