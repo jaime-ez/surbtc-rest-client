@@ -194,7 +194,7 @@ Client.prototype._getOrderPages = function (orders, marketId, state, callback, l
   }
 }
 
-Client.prototype._getOrderStatus = function (order, status, callback, loopFunction) {
+Client.prototype._getOrderState = function (order, status, callback, loopFunction) {
   var self = this
 
   if (order.success && order.order.state !== status) {
@@ -219,11 +219,11 @@ Client.prototype.pollOrders = function (orders, marketId, state, callback) {
     self._getOrderPages.bind(this))
 }
 
-Client.prototype.pollOrderStatus = function (order, status, callback) {
+Client.prototype.pollOrderState = function (order, status, callback) {
   var self = this
 
-  self._getOrderStatus(order, status, callback,
-    self._getOrderStatus.bind(this))
+  self._getOrderState(order, status, callback,
+    self._getOrderState.bind(this))
 }
 
 Client.prototype.getOrdersRaw = function (marketId, page, callback) {
@@ -336,7 +336,7 @@ Client.prototype.createAndTradeOrder = function (marketId, order, callback) {
       self.createOrder(marketId, order, next)
     },
     function (createdOrder, next) {
-      self.pollOrderStatus(createdOrder, 'traded', next)
+      self.pollOrderState(createdOrder, 'traded', next)
     }
   ], callback)
 }
