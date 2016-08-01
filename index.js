@@ -161,11 +161,19 @@ Client.prototype.createOrder = function (marketId, order, callback) {
   })
 }
 
-Client.prototype._getOrderPages = function (orders, marketId, callback, loopFunction) {
+Client.prototype._getOrderPages = function (orders, marketId, state, callback, loopFunction) {
   var self = this
 
   // check if there are any more pages
   var page = _.toNumber(orders.meta.current_page)
+
+  // filter orders by state
+  if (orders.success && state) {
+    orders.orders = _.filter(orders.orders, {state: state})
+    if(page === orders.meta.total_pages) {
+      orders.meta = {total_count: orders.orders.length}
+    }
+  }
 
   if (orders.success && page < orders.meta.total_pages) {
     ++page
@@ -179,7 +187,7 @@ Client.prototype._getOrderPages = function (orders, marketId, callback, loopFunc
       orders.orders = _.concat(orders.orders, response.orders)
       orders.meta.current_page = page
 
-      loopFunction(orders, marketId, callback, loopFunction)
+      loopFunction(orders, marketId, state, callback, loopFunction)
     })
   } else {
     callback(null, orders)
@@ -204,10 +212,10 @@ Client.prototype._getOrderStatus = function (order, status, callback, loopFuncti
   }
 }
 
-Client.prototype.pollOrders = function (orders, marketId, callback) {
+Client.prototype.pollOrders = function (orders, marketId, state, callback) {
   var self = this
 
-  self._getOrderPages(orders, marketId, callback,
+  self._getOrderPages(orders, marketId, state, callback,
     self._getOrderPages.bind(this))
 }
 
@@ -252,7 +260,20 @@ Client.prototype.getOrders = function (marketId, callback) {
       self.getOrdersRaw(marketId, 0, next)
     },
     function (orders, next) {
-      self.pollOrders(orders, marketId, next)
+      self.pollOrders(orders, marketId, false, next)
+    }
+  ], callback)
+}
+
+Client.prototype.getOrdersByState = function (marketId, state, callback) {
+  var self = this
+
+  async.waterfall([
+    function (next) {
+      self.getOrdersRaw(marketId, 0, next)
+    },
+    function (orders, next) {
+      self.pollOrders(orders, marketId, state, next)
     }
   ], callback)
 }
