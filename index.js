@@ -186,11 +186,36 @@ Client.prototype._getOrderPages = function (orders, marketId, callback, loopFunc
   }
 }
 
+Client.prototype._getOrderStatus = function (order, status, callback, loopFunction) {
+  var self = this
+
+  if (order.success && order.order.state !== status) {
+    self.getOrderId(order.order.id, function (error, response) {
+      if (error) {
+        return callback(error, null)
+      }
+
+      setTimeout(function () {
+        loopFunction(response, status, callback, loopFunction)
+      }, 500)
+    })
+  } else {
+    callback(null, order)
+  }
+}
+
 Client.prototype.pollOrders = function (orders, marketId, callback) {
   var self = this
 
   self._getOrderPages(orders, marketId, callback,
     self._getOrderPages.bind(this))
+}
+
+Client.prototype.pollOrderStatus = function (order, status, callback) {
+  var self = this
+
+  self._getOrderStatus(order, status, callback,
+    self._getOrderStatus.bind(this))
 }
 
 Client.prototype.getOrdersRaw = function (marketId, page, callback) {
@@ -280,6 +305,19 @@ Client.prototype.cancelOrderId = function (orderId, callback) {
     }
     callback(null, response.json)
   })
+}
+
+Client.prototype.createAndTradeOrder = function (marketId, order, callback) {
+  var self = this
+
+  async.waterfall([
+    function (next) {
+      self.createOrder(marketId, order, next)
+    },
+    function (createdOrder, next) {
+      self.pollOrderStatus(createdOrder, 'traded', next)
+    }
+  ], callback)
 }
 
 module.exports = Client
