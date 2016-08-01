@@ -1,18 +1,16 @@
-'use strict';
+'use strict'
 
-var Client = require('../');
-var assert = require('chai').assert;
-var account_info = require('./fixtures/account_info')();
+var Client = require('../')
+var assert = require('chai').assert
 
-describe('Ripple REST Client Generate UUID', function() {
-  it('should successfully get UUID', function(done) {
-    var client = new Client({
-      account: account_info.source_account
-    });
+describe('Ripple REST Client Generate UUID', function () {
+  it('should successfully get UUID', function (done) {
+    var client = new Client({})
 
-    client.generateUUID(function(error, response) {
-      assert(response);
-      done();
-    });
-  });
-});
+    client.generateUUID(function (error, response) {
+      assert(!error)
+      assert(response)
+      done()
+    })
+  })
+})
