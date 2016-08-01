@@ -2,6 +2,7 @@
 
 var Client = require('../')
 var assert = require('chai').assert
+var accountSecret = require('./fixtures/account_info').secret()
 var errorFixture = require('./fixtures/cancel_order_id').error
 var success = require('./fixtures/cancel_order_id').success
 var orders = require('./fixtures/cancel_order_id').orders()
@@ -11,7 +12,8 @@ describe('Surbtc REST Client Cancel Order Id', function () {
   async.eachSeries(orders, function (orderId, cb) {
     it('should cancel order ID ' + orderId, function (done) {
       var client = new Client({
-        api: 'https://stg.surbtc.com/api/'
+        api: 'https://stg.surbtc.com/api/',
+        secret: accountSecret
       })
 
       client.cancelOrderId(orderId, function (error, response) {
@@ -27,7 +29,8 @@ describe('Surbtc REST Client Cancel Order Id', function () {
   async.eachSeries(orders, function (orderId, cb) {
     it('should fail to cancel order ID ' + orderId, function (done) {
       var client = new Client({
-        api: 'https://stg.surbtc.com/api/12'
+        api: 'https://stg.surbtc.com/api/12',
+        secret: 'akdjs'
       })
 
       client.cancelOrderId(orderId, function (error, response) {
