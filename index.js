@@ -254,4 +254,32 @@ Client.prototype.getOrderId = function (orderId, callback) {
   })
 }
 
+Client.prototype.cancelOrderId = function (orderId, callback) {
+  var url = this.api + 'v1/orders/' + orderId
+
+  if (this.secret !== '') {
+    url += '?api_key=' + this.secret
+  } else {
+    return callback(new Error('InvalidRequest:ApiKeyRequired'))
+  }
+
+  http
+  .put(url)
+  .set({'Accept': 'application/json', 'Content-Type': 'application/json'})
+  .send({state: 'canceling'})
+  .end(function (error, response) {
+    if (error) {
+      responseHandler.errorSet(error, error.response.error)
+      return callback(error.json)
+    }
+    responseHandler.success(response, response.body)
+    if (response.json.order.state !== 'canceling' && response.json.order.state !== 'canceled') {
+      response.json.success = false
+      response.json.error_type = 'order_not_valid_for_canceling'
+      return callback(response.json, null)
+    }
+    callback(null, response.json)
+  })
+}
+
 module.exports = Client
