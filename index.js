@@ -28,6 +28,30 @@ Client.prototype.getMarkets = function (callback) {
   })
 }
 
+Client.prototype.getBalance = function (currency, callback) {
+  var url = this.api + 'v1/balances/' + currency
+
+  if (this.secret !== '') {
+    url += '?api_key=' + this.secret
+  } else {
+    var err = {}
+    responseHandler.invalidRequest(err, 'InvalidRequest:ApiKeyRequired', null)
+    return callback(err.json, null)
+  }
+
+  http
+  .get(url)
+  .set({'Accept': 'application/json', 'Content-Type': 'application/json'})
+  .end(function (error, response) {
+    if (error) {
+      responseHandler.errorSet(error, error.response.error)
+      return callback(error.json)
+    }
+    responseHandler.success(response, response.body)
+    callback(null, response.json)
+  })
+}
+
 Client.prototype.getExchangeFee = function (marketId, type, marketOrder, callback) {
   _.capitalize(type)
   var url = this.api + 'v1/markets/' + marketId + '/fee_percentage?type=' + type
