@@ -232,4 +232,26 @@ Client.prototype.getOrders = function (marketId, callback) {
   ], callback)
 }
 
+Client.prototype.getOrderId = function (orderId, callback) {
+  var url = this.api + 'v1/orders/' + orderId
+
+  if (this.secret !== '') {
+    url += '?api_key=' + this.secret
+  } else {
+    return callback(new Error('InvalidRequest:ApiKeyRequired'))
+  }
+
+  http
+  .get(url)
+  .set({'Accept': 'application/json', 'Content-Type': 'application/json'})
+  .end(function (error, response) {
+    if (error) {
+      responseHandler.errorSet(error, error.response.error)
+      return callback(error.json)
+    }
+    responseHandler.success(response, response.body)
+    callback(null, response.json)
+  })
+}
+
 module.exports = Client
