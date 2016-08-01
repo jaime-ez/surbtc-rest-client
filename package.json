@@ -1,0 +1,38 @@
+{
+  "name": "surbtc-rest-client",
+  "version": "0.0.1",
+  "description": "A Node.js client library for interacting with surbtc REST API.",
+  "main": "./index.js",
+  "scripts": {
+    "test": "mocha test/ --timeout=5000"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@bitbucket.org/jaime-ez/remittance-rest-client.git"
+  },
+  "keywords": [
+    "remittance",
+    "api",
+    "http",
+    "client"
+  ],
+  "author": "Jaime Echegaray Zipper",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://jaime-ez@bitbucket.org/jaime-ez/surbtc-rest-client.git"
+  },
+  "dependencies": {
+    "async": "^2.0.1",
+    "lodash": "^4.14.0",
+    "node-uuid": "^1.4.7",
+    "superagent": "^2.1.0"
+  },
+  "devDependencies": {
+    "chai": "^2.1.2",
+    "mocha": "^2.2.1"
+  },
+  "homepage": "https://bitbucket.org/jaime-ez/remittance-rest-client#readme",
+  "directories": {
+    "test": "test"
+  }
+}
