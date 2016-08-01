@@ -6,16 +6,10 @@ var http = require('superagent')
 var _ = require('lodash')
 var responseHandler = require('./lib/response_handler')
 
-var errors = require('./lib/errors')
-
 function Client (options) {
   this.api = options.api || 'https://surbtc.com/api/'
   this.account = options.account
-  this.secret = options.secret || 'a061fc555331d1285a89b012676d6e7c'
-  this.version = options.version || 1
-  this.sourceCurrency = options.sourceCurrency || 'CLP'
-  this.destinationCurrency = options.destinationCurrency || 'COP'
-  this.bridgeCurrency = options.bridgeCurrency || 'BTC'
+  this.secret = options.secret || ''
   this.params = options.params || {}
 }
 
@@ -41,7 +35,9 @@ Client.prototype.getExchangeFee = function (marketId, type, marketOrder, callbac
   if (this.secret !== '') {
     url += '&api_key=' + this.secret
   } else {
-    return callback(new Error('InvalidRequest:ApiKeyRequired'))
+    var err = {}
+    responseHandler.invalidRequest(err, 'InvalidRequest:ApiKeyRequired', null)
+    return callback(err.json, null)
   }
 
   if (marketOrder && _.isFunction(marketOrder)) {
@@ -143,7 +139,9 @@ Client.prototype.createOrder = function (marketId, order, callback) {
   if (this.secret !== '') {
     url += '?api_key=' + this.secret
   } else {
-    return callback(new Error('InvalidRequest:ApiKeyRequired'))
+    var err = {}
+    responseHandler.invalidRequest(err, 'InvalidRequest:ApiKeyRequired', null)
+    return callback(err.json, null)
   }
 
   http
@@ -170,7 +168,7 @@ Client.prototype._getOrderPages = function (orders, marketId, state, callback, l
   // filter orders by state
   if (orders.success && state) {
     orders.orders = _.filter(orders.orders, {state: state})
-    if(page === orders.meta.total_pages) {
+    if (page === orders.meta.total_pages) {
       orders.meta = {total_count: orders.orders.length}
     }
   }
@@ -232,7 +230,9 @@ Client.prototype.getOrdersRaw = function (marketId, page, callback) {
   if (this.secret !== '') {
     url += '?api_key=' + this.secret
   } else {
-    return callback(new Error('InvalidRequest:ApiKeyRequired'))
+    var err = {}
+    responseHandler.invalidRequest(err, 'InvalidRequest:ApiKeyRequired', null)
+    return callback(err.json, null)
   }
 
   if (page) {
@@ -284,7 +284,9 @@ Client.prototype.getOrderId = function (orderId, callback) {
   if (this.secret !== '') {
     url += '?api_key=' + this.secret
   } else {
-    return callback(new Error('InvalidRequest:ApiKeyRequired'))
+    var err = {}
+    responseHandler.invalidRequest(err, 'InvalidRequest:ApiKeyRequired', null)
+    return callback(err.json, null)
   }
 
   http
@@ -306,7 +308,9 @@ Client.prototype.cancelOrderId = function (orderId, callback) {
   if (this.secret !== '') {
     url += '?api_key=' + this.secret
   } else {
-    return callback(new Error('InvalidRequest:ApiKeyRequired'))
+    var err = {}
+    responseHandler.invalidRequest(err, 'InvalidRequest:ApiKeyRequired', null)
+    return callback(err.json, null)
   }
 
   http
