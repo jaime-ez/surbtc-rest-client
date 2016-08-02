@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@bitbucket.org/jaime-ez/remittance-rest-client.git"
+    "url": "https://github.com/dinexcode/surbtc-rest-client"
   },
   "keywords": [
     "remittance",
@@ -19,7 +19,7 @@
   "author": "Jaime Echegaray Zipper",
   "license": "MIT",
   "bugs": {
-    "url": "https://jaime-ez@bitbucket.org/jaime-ez/surbtc-rest-client.git"
+    "url": "https://github.com/dinexcode/surbtc-rest-client/issues"
   },
   "dependencies": {
     "async": "^2.0.1",
@@ -31,7 +31,7 @@
     "chai": "^2.1.2",
     "mocha": "^2.2.1"
   },
-  "homepage": "https://bitbucket.org/jaime-ez/remittance-rest-client#readme",
+  "homepage": "https://github.com/dinexcode/surbtc-rest-client",
   "directories": {
     "test": "test"
   }
