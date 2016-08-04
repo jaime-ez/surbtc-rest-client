@@ -108,6 +108,14 @@ Client.prototype.getOrderBook = function (marketId, callback) {
 Client.prototype.getQuotation = function (marketId, type, total, callback) {
   var url = this.api + 'v1/markets/' + marketId + '/quotation?type=' + type + '&total=' + total
 
+  if (this.secret !== '') {
+    url += '&api_key=' + this.secret
+  } else {
+    var err = {}
+    responseHandler.invalidRequest(err, 'InvalidRequest:ApiKeyRequired', null)
+    return callback(err.json, null)
+  }
+
   http
   .get(url)
   .set({'Accept': 'application/json', 'Content-Type': 'application/json'})
@@ -133,6 +141,14 @@ Client.prototype.getQuotation = function (marketId, type, total, callback) {
 
 Client.prototype.getReverseQuotation = function (marketId, type, amount, callback) {
   var url = this.api + 'v1/markets/' + marketId + '/reverse_quotation?type=' + type + '&amount=' + amount
+
+  if (this.secret !== '') {
+    url += '&api_key=' + this.secret
+  } else {
+    var err = {}
+    responseHandler.invalidRequest(err, 'InvalidRequest:ApiKeyRequired', null)
+    return callback(err.json, null)
+  }
 
   http
   .get(url)
