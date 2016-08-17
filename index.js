@@ -21,7 +21,7 @@ Client.prototype.getMarkets = function (callback) {
   .end(function (error, response) {
     if (error) {
       responseHandler.errorSet(error, error.response.error)
-      return callback(error.json)
+      return callback(error.json, null)
     }
     responseHandler.success(response, response.body)
     callback(null, response.json)
@@ -45,7 +45,7 @@ Client.prototype.getBalance = function (currency, callback) {
   .end(function (error, response) {
     if (error) {
       responseHandler.errorSet(error, error.response.error)
-      return callback(error.json)
+      return callback(error.json, null)
     }
     responseHandler.success(response, response.body)
     callback(null, response.json)
@@ -78,7 +78,7 @@ Client.prototype.getExchangeFee = function (marketId, type, marketOrder, callbac
   .end(function (error, response) {
     if (error) {
       responseHandler.errorSet(error, error.response.error)
-      return callback(error.json)
+      return callback(error.json, null)
     }
     responseHandler.success(response, response.body)
     callback(null, response.json)
@@ -98,7 +98,7 @@ Client.prototype.getOrderBook = function (marketId, callback) {
   .end(function (error, response) {
     if (error) {
       responseHandler.errorSet(error, error.response.error)
-      return callback(error.json)
+      return callback(error.json, null)
     }
     responseHandler.success(response, response.body)
     callback(null, response.json)
@@ -122,7 +122,7 @@ Client.prototype.getQuotation = function (marketId, type, total, callback) {
   .end(function (error, response) {
     if (error) {
       responseHandler.errorSet(error, error.response.error)
-      return callback(error.json)
+      return callback(error.json, null)
     }
 
     var res = JSON.parse(response.text)
@@ -156,7 +156,7 @@ Client.prototype.getReverseQuotation = function (marketId, type, amount, callbac
   .end(function (error, response) {
     if (error) {
       responseHandler.errorSet(error, error.response.error)
-      return callback(error.json)
+      return callback(error.json, null)
     }
 
     var res = response.body
@@ -191,7 +191,7 @@ Client.prototype.createOrder = function (marketId, order, callback) {
   .end(function (error, response) {
     if (error) {
       responseHandler.errorSet(error, error.response.error)
-      return callback(error.json)
+      return callback(error.json, null)
     }
 
     responseHandler.success(response, response.body)
@@ -285,7 +285,7 @@ Client.prototype.getOrdersRaw = function (marketId, page, callback) {
   .end(function (error, response) {
     if (error) {
       responseHandler.errorSet(error, error.response.error)
-      return callback(error.json)
+      return callback(error.json, null)
     }
     responseHandler.success(response, response.body)
     callback(null, response.json)
@@ -335,7 +335,7 @@ Client.prototype.getOrderId = function (orderId, callback) {
   .end(function (error, response) {
     if (error) {
       responseHandler.errorSet(error, error.response.error)
-      return callback(error.json)
+      return callback(error.json, null)
     }
     responseHandler.success(response, response.body)
     callback(null, response.json)
@@ -360,7 +360,7 @@ Client.prototype.cancelOrderId = function (orderId, callback) {
   .end(function (error, response) {
     if (error) {
       responseHandler.errorSet(error, error.response.error)
-      return callback(error.json)
+      return callback(error.json, null)
     }
     responseHandler.success(response, response.body)
     if (response.json.order.state !== 'canceling' && response.json.order.state !== 'canceled') {
