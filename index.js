@@ -133,6 +133,7 @@ Client.prototype.getQuotation = function (marketId, type, total, callback) {
       res.status = 503
       res.error = res.quotation.error_message
       responseHandler.errorSet(response, res)
+      return callback(response.json, null)
     }
 
     callback(null, response.json)
@@ -167,6 +168,7 @@ Client.prototype.getReverseQuotation = function (marketId, type, amount, callbac
       res.status = 503
       res.error = res.reverse_quotation.error_message
       responseHandler.errorSet(response, res)
+      return callback(response.json, null)
     }
 
     callback(null, response.json)
