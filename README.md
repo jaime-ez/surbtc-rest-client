@@ -1,59 +1,58 @@
 # surbtc-rest-client #
 
-This nodejs module connects to surbtc api in order to get quotes and execute orders.  
+This nodejs module connects to surbtc api in order to get quotes and execute orders.
 
-[![JavaScript Style Guide](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)  
+[![JavaScript Style Guide](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
 
 ## Installation
 
     npm install surbtc-rest-client
 
 ### Usage
-    
-    var surbtcRestClient = require("surbtc-rest-client").Client;
-    
+
+    var surbtcRestClient = require("surbtc-rest-client");
+
     var client = new surbtcRestClient({
       api: 'http://surbtc.com/api/',
-      secret: 'apiKey',      
+      secret: 'apiKey',
       params: {}
-      }
-    });    
-    
+      });
 
-### Primary functions  
 
-#### Get Markets  
+### Primary functions
+
+#### Get Markets
 
     client.getMarkets(function(err, res){
-      
-    })
-    
-#### Get Exchange Fee  
 
-- marketId: string - required    
-- type: string - required  
-- marketOrder: boolean - optional  
+    })
+
+#### Get Exchange Fee
+
+- marketId: string - required
+- type: string - required
+- marketOrder: boolean - optional
 
         client.getExchangeFee(marketId, type, marketOrder, function(err, res){
 
         })
-    
-#### Generate UUID  
+
+#### Generate UUID
 
     client.generateUUID(function(err, res){
-    
-    })  
-    
-#### Get Order Book  
 
-- marketId: string - required  
+    })
+
+#### Get Order Book
+
+- marketId: string - required
 
 
         client.getOrderBook(marketId, function (err, res){
 
-        })  
-    
-Response:  
+        })
+
+Response:
 
       {
         success: true,
@@ -62,21 +61,21 @@ Response:
           bids: [amount, limit]
         }
       }
-    
-#### Get Quotation  
 
-Total is the number of CLP cents I am willing to give in order to get BTC satoshi's amount  
+#### Get Quotation
 
-- marketId: string - required  
-- type: string - required  
-- total: Number - required    
+Total is the number of CLP cents I am willing to give in order to get BTC satoshi's amount
+
+- marketId: string - required
+- type: string - required
+- total: Number - required
 
 
         client.getQuotation(marketId, type, total, function(err, res){
 
-        })  
-    
-Response: 
+        })
+
+Response:
 
       {
         success: true,
@@ -84,25 +83,25 @@ Response:
           amount: ,
           expected_base_change: ,
           error_message: ,
-          price: 
+          price:
         }
-      }  
-      
-    
-#### Get Reverse Quotation  
+      }
 
-Amount is the number of satoshis I am willing to buy/sell in order to get CLP cents total  
 
-- marketId: string - required  
-- type: string - required  
-- amount: Number - required  
+#### Get Reverse Quotation
+
+Amount is the number of satoshis I am willing to buy/sell in order to get CLP cents total
+
+- marketId: string - required
+- type: string - required
+- amount: Number - required
 
 
         client.getReverseQuotation(marketId, type, amount, function(err, res){
 
         })
-    
-Response:  
+
+Response:
 
       {
         success: true,
@@ -115,10 +114,10 @@ Response:
       }
 
 
-#### Create Order  
+#### Create Order
 
-- marketId: string - required  
-- order: 
+- marketId: string - required
+- order:
       order: {
         type:,
         limit:,
@@ -130,8 +129,8 @@ Response:
 
         client.createOrder(marketId, order, function(err, res){
 
-        })  
-    
+        })
+
 Response:
 
     {
@@ -150,18 +149,18 @@ Response:
         fee_currency: ,
         price_type: ,
         weighted_quotation: ,
-        account_id: 
+        account_id:
       }
     }
 
-    
-#### Get Orders  
+
+#### Get Orders
 
     client.getOrders(marketId, function(err, res){
-    
-    })  
-    
-Response:  
+
+    })
+
+Response:
 
     {
       success: true,
@@ -169,15 +168,15 @@ Response:
       meta: {}
     }
 
-    
-#### Get Orders by State  
+
+#### Get Orders by State
 
 
     client.getOrdersByState(marketId, state, function(err, res){
-    
-    })  
-    
-Response:  
+
+    })
+
+Response:
 
     {
       success: true,
@@ -186,13 +185,13 @@ Response:
     }
 
 
-#### Get Order Id  
+#### Get Order Id
 
     client.getOrderId(orderId, function(err, res){
-    
-    })  
-    
-Response:  
+
+    })
+
+Response:
 
     {
       success: true,
@@ -215,13 +214,13 @@ Response:
     }
 
 
-#### Cancel Order Id  
+#### Cancel Order Id
 
     client.cancelOrderId(orderId, function(err, res){
-    
-    })  
-    
-Response:  
+
+    })
+
+Response:
 
     {
       success: true,
@@ -243,14 +242,14 @@ Response:
       }
     }
 
-    
-### Create and Trade Order  
+
+### Create and Trade Order
 
     client.createAndConfirmOrder(marketId, order, function(err, res){
-    
-    })  
-    
-Response:  
+
+    })
+
+Response:
 
      {
         success: true,
@@ -272,14 +271,13 @@ Response:
         }
       }
 
-## To Do:  
+## To Do:
 
-### Should we promisify or promisifyAll this?  
+### Should we promisify or promisifyAll this?
 
-http://bluebirdjs.com/docs/api/promise.promisify.html  
+http://bluebirdjs.com/docs/api/promise.promisify.html
 http://bluebirdjs.com/docs/api/promise.promisifyall.html
 
-### createAndTradeOrder  
+### createAndTradeOrder
 
-Should cancel order if not traded after X seconds?  
-
+Should cancel order if not traded after X seconds?
