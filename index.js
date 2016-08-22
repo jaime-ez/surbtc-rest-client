@@ -11,13 +11,14 @@ function Client (options) {
   this.account = options.account
   this.secret = options.secret || ''
   this.params = options.params || {}
+  this.headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
 }
 
 Client.prototype.getMarkets = function (callback) {
   var url = this.api + 'v1/markets'
   http
   .get(url)
-  .set({'Accept': 'application/json', 'Content-Type': 'application/json'})
+  .set(this.headers)
   .end(function (error, response) {
     if (error) {
       responseHandler.errorSet(error, error.response.error)
@@ -41,7 +42,7 @@ Client.prototype.getBalance = function (currency, callback) {
 
   http
   .get(url)
-  .set({'Accept': 'application/json', 'Content-Type': 'application/json'})
+  .set(this.headers)
   .end(function (error, response) {
     if (error) {
       responseHandler.errorSet(error, error.response.error)
@@ -74,7 +75,7 @@ Client.prototype.getExchangeFee = function (marketId, type, marketOrder, callbac
 
   http
   .get(url)
-  .set({'Accept': 'application/json', 'Content-Type': 'application/json'})
+  .set(this.headers)
   .end(function (error, response) {
     if (error) {
       responseHandler.errorSet(error, error.response.error)
@@ -94,7 +95,7 @@ Client.prototype.getOrderBook = function (marketId, callback) {
 
   http
   .get(url)
-  .set({'Accept': 'application/json', 'Content-Type': 'application/json'})
+  .set(this.headers)
   .end(function (error, response) {
     if (error) {
       responseHandler.errorSet(error, error.response.error)
@@ -118,7 +119,7 @@ Client.prototype.getQuotation = function (marketId, type, total, callback) {
 
   http
   .get(url)
-  .set({'Accept': 'application/json', 'Content-Type': 'application/json'})
+  .set(this.headers)
   .end(function (error, response) {
     if (error) {
       responseHandler.errorSet(error, error.response.error)
@@ -153,7 +154,7 @@ Client.prototype.getReverseQuotation = function (marketId, type, amount, callbac
 
   http
   .get(url)
-  .set({'Accept': 'application/json', 'Content-Type': 'application/json'})
+  .set(this.headers)
   .end(function (error, response) {
     if (error) {
       responseHandler.errorSet(error, error.response.error)
@@ -188,7 +189,7 @@ Client.prototype.createOrder = function (marketId, order, callback) {
 
   http
   .post(url)
-  .set({'Accept': 'application/json', 'Content-Type': 'application/json'})
+  .set(this.headers)
   .send(order)
   .end(function (error, response) {
     if (error) {
@@ -283,7 +284,7 @@ Client.prototype.getOrdersRaw = function (marketId, page, callback) {
 
   http
   .get(url)
-  .set({'Accept': 'application/json', 'Content-Type': 'application/json'})
+  .set(this.headers)
   .end(function (error, response) {
     if (error) {
       responseHandler.errorSet(error, error.response.error)
@@ -333,7 +334,7 @@ Client.prototype.getOrderId = function (orderId, callback) {
 
   http
   .get(url)
-  .set({'Accept': 'application/json', 'Content-Type': 'application/json'})
+  .set(this.headers)
   .end(function (error, response) {
     if (error) {
       responseHandler.errorSet(error, error.response.error)
@@ -357,7 +358,7 @@ Client.prototype.cancelOrderId = function (orderId, callback) {
 
   http
   .put(url)
-  .set({'Accept': 'application/json', 'Content-Type': 'application/json'})
+  .set(this.headers)
   .send({state: 'canceling'})
   .end(function (error, response) {
     if (error) {
