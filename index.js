@@ -119,6 +119,7 @@ Client.prototype.getOrderBook = function (marketId, callback) {
 
 Client.prototype.getQuotation = function (marketId, type, amount, callback) {
   // Requires API_KEY
+  type = _.lowerCase(type)
 
   var path = '/markets/' + marketId + '/quotations'
 
@@ -150,6 +151,7 @@ Client.prototype.getQuotation = function (marketId, type, amount, callback) {
 
 Client.prototype.getReverseQuotation = function (marketId, type, amount, callback) {
   // Requires API_KEY
+  type = _.lowerCase(type)
 
   var path = '/markets/' + marketId + '/quotations'
 
