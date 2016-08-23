@@ -12,7 +12,7 @@ describe('Surbtc REST Client Cancel Order Id', function () {
   async.eachSeries(orders, function (orderId, cb) {
     it('should cancel order ID ' + orderId, function (done) {
       var client = new Client({
-        api: 'https://stg.surbtc.com/api/',
+        api: 'https://stg.surbtc.com/api/v1',
         secret: accountSecret
       })
 

@@ -12,7 +12,7 @@ describe('Surbtc REST Client Get Orders', function () {
   async.eachSeries(markets, function (marketId, cb) {
     it('should get orders for market ' + marketId, function (done) {
       var client = new Client({
-        api: 'https://stg.surbtc.com/api/',
+        api: 'https://stg.surbtc.com/api/v1',
         secret: accountSecret
       })
 
@@ -29,7 +29,7 @@ describe('Surbtc REST Client Get Orders', function () {
   async.eachSeries(markets, function (marketId, cb) {
     it('should fail to get orders for market ' + marketId, function (done) {
       var client = new Client({
-        api: 'https://stg.surbtc.com/api/',
+        api: 'https://stg.surbtc.com/api/v1',
         secret: 'dfg'
       })
 

@@ -14,7 +14,7 @@ describe('Surbtc REST Client Get Exchange Fee', function () {
     async.eachSeries(markets, function (marketId, callback) {
       it('should get exchange fee for limit order type ' + type + ' in market ' + marketId, function (done) {
         var client = new Client({
-          api: 'https://stg.surbtc.com/api/',
+          api: 'https://stg.surbtc.com/api/v1',
           secret: accountSecret
         })
 
@@ -29,7 +29,7 @@ describe('Surbtc REST Client Get Exchange Fee', function () {
 
       it('should get exchange fee for market_order order type ' + type + ' in market ' + marketId, function (done) {
         var client = new Client({
-          api: 'https://stg.surbtc.com/api/',
+          api: 'https://stg.surbtc.com/api/v1',
           secret: accountSecret
         })
 
@@ -50,7 +50,7 @@ describe('Surbtc REST Client Get Exchange Fee', function () {
     async.eachSeries(markets, function (marketId, callback) {
       it('should fail to get exchange fee for limit order type ' + type + ' in market ' + marketId, function (done) {
         var client = new Client({
-          api: 'https://stg.surbtc.com/api/',
+          api: 'https://stg.surbtc.com/api/v1',
           secret: 'jhgkjhgk'
         })
 

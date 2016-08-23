@@ -1,10 +1,11 @@
-'use strict';
+'use strict'
 
 exports.success = function (args) {
   return {
     success: true,
+    statusCode: args.statusCode,
     fee_percentage: {
-      value:args.fee_percentage.value
+      value: args.fee_percentage.value
     }
   }
 }
@@ -12,20 +13,21 @@ exports.success = function (args) {
 exports.error = function (args) {
   return {
     success: false,
+    statusCode: args.statusCode,
     error_type: args.error_type
   }
 }
 
-exports.types = function() {
+exports.types = function () {
   return [
-    'Ask',
-    'Bid'
+    'ask',
+    'bid'
   ]
 }
 
 exports.markets = function () {
   return [
-    'BTC-CLP',
-    'BTC-COP'
+    'btc-clp',
+    'btc-cop'
   ]
 }

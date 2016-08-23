@@ -6,6 +6,7 @@ var errorFixture = require('./fixtures/get_reverse_quotation').error
 var success = require('./fixtures/get_reverse_quotation').success
 var types = require('./fixtures/get_reverse_quotation').types()
 var markets = require('./fixtures/get_reverse_quotation').markets()
+var accountSecret = require('./fixtures/account_info').secret()
 var async = require('async')
 var amount = 1000
 
@@ -13,7 +14,10 @@ describe('Surbtc REST Client Get reverse quotation', function () {
   async.eachSeries(types, function (type, cb) {
     async.eachSeries(markets, function (marketId, callback) {
       it('should get reverse quotation for limit order type ' + type + ' in market ' + marketId + ' for amount ' + amount, function (done) {
-        var client = new Client({})
+        var client = new Client({
+          api: 'https://stg.surbtc.com/api/v1',
+          secret: accountSecret
+        })
 
         client.getReverseQuotation(marketId, type, amount, function (error, response) {
           assert(!error)

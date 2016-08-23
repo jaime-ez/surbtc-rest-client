@@ -3,26 +3,31 @@
 exports.success = function (args) {
   return {
     success: true,
+    statusCode: args.statusCode,
     quotation: {
       amount: args.quotation.amount,
-      expected_base_change: args.quotation.expected_base_change,
-      error_message: args.quotation.error_message,
-      price: args.quotation.price
+      base_balance_change: args.quotation.base_balance_change,
+      fee: args.quotation.fee,
+      incomplete: false,
+      order_amount: args.quotation.order_amount,
+      quote_balance_change: args.quotation.quote_balance_change,
+      reverse: false,
+      type: args.quotation.type
     }
   }
 }
 
 exports.types = function () {
   return [
-    'Ask',
-    'Bid'
+    'ask',
+    'bid'
   ]
 }
 
 exports.markets = function () {
   return [
-    'BTC-CLP',
-    'BTC-COP'
+    'btc-clp',
+    'btc-cop'
   ]
 }
 
@@ -30,13 +35,16 @@ exports.error = function (args) {
   if (args.message === 'not_enough_orders') {
     return {
       success: false,
+      statusCode: args.statusCode,
       error_type: 'server',
       message: 'not_enough_orders'
     }
   } else {
     return {
       success: false,
-      error_type: args.error_type
+      statusCode: args.statusCode,
+      error_type: args.error_type,
+      message: args.message
     }
   }
 }

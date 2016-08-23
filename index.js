@@ -7,7 +7,7 @@ var _ = require('lodash')
 var responseHandler = require('./lib/response_handler')
 
 function Client (options) {
-  this.api = options.api || 'https://stg.surbtc.com/api/v1'
+  this.api = options.api || 'https://surbtc.com/api/v1'
   this.secret = options.secret || ''
   this.params = options.params || {}
   this.headers = options.headers || {
@@ -66,7 +66,7 @@ Client.prototype.getBalances = function (currency, callback) {
 
 Client.prototype.getExchangeFee = function (marketId, type, marketOrder, callback) {
   // Requires API_KEY
-  _.capitalize(type)
+  type = _.capitalize(type)
 
   var path = '/markets/' + marketId + '/fee_percentage?type=' + type
 
@@ -188,7 +188,6 @@ Client.prototype.createOrder = function (marketId, order, callback) {
     responseHandler.invalidRequest(err, 'InvalidRequest:ApiKeyRequired', null)
     return callback(err.json, null)
   }
-
   http
   .post(this.getFullUrl(path))
   .set(this.headers)
@@ -280,7 +279,7 @@ Client.prototype.getOrdersRaw = function (marketId, page, callback) {
   }
 
   if (page) {
-    path += '&page=' + page
+    path += '?page=' + page
   }
 
   http
