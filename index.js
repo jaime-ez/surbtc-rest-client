@@ -42,8 +42,8 @@ Client.prototype.getMarkets = function (callback) {
   })
 }
 
-Client.prototype.getBalances = function (callback) {
-  var path = '/balances'
+Client.prototype.getBalances = function (currency, callback) {
+  var path = '/balances/' + currency
   // Requires API_KEY
   if (this.secret === '') {
     var err = {}
