@@ -1,6 +1,6 @@
 {
   "name": "surbtc-rest-client",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "A Node.js client library for interacting with surbtc REST API.",
   "main": "./index.js",
   "scripts": {
@@ -19,7 +19,7 @@
   "author": "Dinex SPA",
   "license": "MIT",
   "bugs": {
-    "url": "https://bitbucket.org/dinex/surbtc-rest-client"
+    "url": "https://bitbucket.org/dinex/surbtc-rest-client/issues"
   },
   "dependencies": {
     "async": "^2.0.1",
