@@ -3,6 +3,7 @@
 exports.success = function (args) {
   return {
     success: true,
+    statusCode: args.statusCode,
     order: {
       id: args.order.id,
       type: args.order.type,
@@ -27,12 +28,14 @@ exports.error = function (args) {
   if (args.error_type === 'unprocessable_entity') {
     return {
       success: false,
+      statusCode: args.statusCode,
       error_type: 'unprocessable_entity',
       errors: args.errors
     }
   } else {
     return {
       success: false,
+      statusCode: args.statusCode,
       error_type: args.error_type
     }
   }
@@ -69,7 +72,7 @@ exports.orders = function () {
 
 exports.markets = function () {
   return [
-    'BTC-CLP',
-    'BTC-COP'
+    'btc-clp',
+    'btc-cop'
   ]
 }

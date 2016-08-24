@@ -7,17 +7,31 @@ var _ = require('lodash')
 var responseHandler = require('./lib/response_handler')
 
 function Client (options) {
-  this.api = options.api || 'https://surbtc.com/api/'
-  this.account = options.account
+  this.api = options.api || 'https://surbtc.com/api/v1'
   this.secret = options.secret || ''
   this.params = options.params || {}
+  this.headers = options.headers || {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json'
+  }
+}
+
+Client.prototype.getFullUrl = function (path) {
+  // FIXME: Don't pass the secret if the method doesn't require it
+  var url = this.api + path
+  if (this.secret !== '') {
+    var paramToken = path.indexOf('?') === -1 ? '?' : '&'
+    return (url + paramToken + 'api_key=' + this.secret)
+  }
+  return url
 }
 
 Client.prototype.getMarkets = function (callback) {
-  var url = this.api + 'v1/markets'
+  var path = '/markets'
+
   http
-  .get(url)
-  .set({'Accept': 'application/json', 'Content-Type': 'application/json'})
+  .get(this.getFullUrl(path))
+  .set(this.headers)
   .end(function (error, response) {
     if (error) {
       responseHandler.errorSet(error, error.response.error)
@@ -28,20 +42,18 @@ Client.prototype.getMarkets = function (callback) {
   })
 }
 
-Client.prototype.getBalance = function (currency, callback) {
-  var url = this.api + 'v1/balances/' + currency
-
-  if (this.secret !== '') {
-    url += '?api_key=' + this.secret
-  } else {
+Client.prototype.getBalances = function (currency, callback) {
+  var path = '/balances/' + currency
+  // Requires API_KEY
+  if (this.secret === '') {
     var err = {}
     responseHandler.invalidRequest(err, 'InvalidRequest:ApiKeyRequired', null)
     return callback(err.json, null)
   }
 
   http
-  .get(url)
-  .set({'Accept': 'application/json', 'Content-Type': 'application/json'})
+  .get(this.getFullUrl(path))
+  .set(this.headers)
   .end(function (error, response) {
     if (error) {
       responseHandler.errorSet(error, error.response.error)
@@ -53,28 +65,28 @@ Client.prototype.getBalance = function (currency, callback) {
 }
 
 Client.prototype.getExchangeFee = function (marketId, type, marketOrder, callback) {
-  _.capitalize(type)
-  var url = this.api + 'v1/markets/' + marketId + '/fee_percentage?type=' + type
+  // Requires API_KEY
+  type = _.capitalize(type)
 
-  if (this.secret !== '') {
-    url += '&api_key=' + this.secret
-  } else {
+  var path = '/markets/' + marketId + '/fee_percentage?type=' + type
+
+  if (this.secret === '') {
     var err = {}
     responseHandler.invalidRequest(err, 'InvalidRequest:ApiKeyRequired', null)
     return callback(err.json, null)
   }
 
-  if (marketOrder && _.isFunction(marketOrder)) {
-    callback = marketOrder
-  }
-
-  if (marketOrder && !_.isFunction(marketOrder)) {
-    url += '&market_order=true'
+  if (marketOrder) {
+    if (_.isFunction(marketOrder)) {
+      callback = marketOrder
+    } else {
+      path += '&market_order=true'
+    }
   }
 
   http
-  .get(url)
-  .set({'Accept': 'application/json', 'Content-Type': 'application/json'})
+  .get(this.getFullUrl(path))
+  .set(this.headers)
   .end(function (error, response) {
     if (error) {
       responseHandler.errorSet(error, error.response.error)
@@ -90,11 +102,11 @@ Client.prototype.generateUUID = function (callback) {
 }
 
 Client.prototype.getOrderBook = function (marketId, callback) {
-  var url = this.api + 'v1/markets/' + marketId + '/order_book'
+  var path = '/markets/' + marketId + '/order_book'
 
   http
-  .get(url)
-  .set({'Accept': 'application/json', 'Content-Type': 'application/json'})
+  .get(this.getFullUrl(path))
+  .set(this.headers)
   .end(function (error, response) {
     if (error) {
       responseHandler.errorSet(error, error.response.error)
@@ -105,90 +117,82 @@ Client.prototype.getOrderBook = function (marketId, callback) {
   })
 }
 
-Client.prototype.getQuotation = function (marketId, type, total, callback) {
-  var url = this.api + 'v1/markets/' + marketId + '/quotation?type=' + type + '&total=' + total
+Client.prototype.getQuotation = function (marketId, type, amount, callback) {
+  // Requires API_KEY
+  type = _.lowerCase(type)
 
-  if (this.secret !== '') {
-    url += '&api_key=' + this.secret
-  } else {
+  var path = '/markets/' + marketId + '/quotations'
+
+  if (this.secret === '') {
     var err = {}
     responseHandler.invalidRequest(err, 'InvalidRequest:ApiKeyRequired', null)
     return callback(err.json, null)
   }
 
   http
-  .get(url)
-  .set({'Accept': 'application/json', 'Content-Type': 'application/json'})
+  .post(this.getFullUrl(path))
+  .send({
+    quotation: {
+      type: type,
+      reverse: false,
+      amount: amount
+    }
+  })
+  .set(this.headers)
   .end(function (error, response) {
     if (error) {
       responseHandler.errorSet(error, error.response.error)
       return callback(error.json, null)
     }
-
-    var res = JSON.parse(response.text)
-    if (res.quotation.success) {
-      delete res.quotation.success
-      responseHandler.success(response, res)
-    } else {
-      res.status = 503
-      res.error = res.quotation.error_message
-      responseHandler.errorSet(response, res)
-      return callback(response.json, null)
-    }
-
+    responseHandler.success(response, response.body)
     callback(null, response.json)
   })
 }
 
 Client.prototype.getReverseQuotation = function (marketId, type, amount, callback) {
-  var url = this.api + 'v1/markets/' + marketId + '/reverse_quotation?type=' + type + '&amount=' + amount
+  // Requires API_KEY
+  type = _.lowerCase(type)
 
-  if (this.secret !== '') {
-    url += '&api_key=' + this.secret
-  } else {
+  var path = '/markets/' + marketId + '/quotations'
+
+  if (this.secret === '') {
     var err = {}
     responseHandler.invalidRequest(err, 'InvalidRequest:ApiKeyRequired', null)
     return callback(err.json, null)
   }
 
   http
-  .get(url)
-  .set({'Accept': 'application/json', 'Content-Type': 'application/json'})
+  .post(this.getFullUrl(path))
+  .send({
+    quotation: {
+      type: type,
+      reverse: true,
+      amount: amount
+    }
+  })
+  .set(this.headers)
   .end(function (error, response) {
     if (error) {
       responseHandler.errorSet(error, error.response.error)
       return callback(error.json, null)
     }
-
-    var res = response.body
-    if (res.reverse_quotation.success) {
-      delete res.reverse_quotation.success
-      responseHandler.success(response, res)
-    } else {
-      res.status = 503
-      res.error = res.reverse_quotation.error_message
-      responseHandler.errorSet(response, res)
-      return callback(response.json, null)
-    }
-
+    responseHandler.success(response, response.body)
     callback(null, response.json)
   })
 }
 
 Client.prototype.createOrder = function (marketId, order, callback) {
-  var url = this.api + 'v1/markets/' + marketId + '/orders'
+  // Requires API_KEY
+  var path = '/markets/' + marketId + '/orders'
 
-  if (this.secret !== '') {
-    url += '?api_key=' + this.secret
-  } else {
+  if (this.secret === '') {
     var err = {}
     responseHandler.invalidRequest(err, 'InvalidRequest:ApiKeyRequired', null)
     return callback(err.json, null)
   }
-
   http
-  .post(url)
-  .set({'Accept': 'application/json', 'Content-Type': 'application/json'})
+  .post(this.getFullUrl(path))
+  .set(this.headers)
   .send(order)
   .end(function (error, response) {
     if (error) {
@@ -267,23 +271,22 @@ Client.prototype.pollOrderState = function (order, status, callback) {
 }
 
 Client.prototype.getOrdersRaw = function (marketId, page, callback) {
-  var url = this.api + 'v1/markets/' + marketId + '/orders'
+  // Requires API_KEY
+  var path = '/markets/' + marketId + '/orders'
 
-  if (this.secret !== '') {
-    url += '?api_key=' + this.secret
-  } else {
+  if (this.secret === '') {
     var err = {}
     responseHandler.invalidRequest(err, 'InvalidRequest:ApiKeyRequired', null)
     return callback(err.json, null)
   }
 
   if (page) {
-    url += '&page=' + page
+    path += '?page=' + page
   }
 
   http
-  .get(url)
-  .set({'Accept': 'application/json', 'Content-Type': 'application/json'})
+  .get(this.getFullUrl(path))
+  .set(this.headers)
   .end(function (error, response) {
     if (error) {
       responseHandler.errorSet(error, error.response.error)
@@ -321,19 +324,18 @@ Client.prototype.getOrdersByState = function (marketId, state, callback) {
 }
 
 Client.prototype.getOrderId = function (orderId, callback) {
-  var url = this.api + 'v1/orders/' + orderId
+  // Requires API_KEY
+  var path = '/orders/' + orderId
 
-  if (this.secret !== '') {
-    url += '?api_key=' + this.secret
-  } else {
+  if (this.secret === '') {
     var err = {}
     responseHandler.invalidRequest(err, 'InvalidRequest:ApiKeyRequired', null)
     return callback(err.json, null)
   }
 
   http
-  .get(url)
-  .set({'Accept': 'application/json', 'Content-Type': 'application/json'})
+  .get(this.getFullUrl(path))
+  .set(this.headers)
   .end(function (error, response) {
     if (error) {
       responseHandler.errorSet(error, error.response.error)
@@ -345,19 +347,18 @@ Client.prototype.getOrderId = function (orderId, callback) {
 }
 
 Client.prototype.cancelOrderId = function (orderId, callback) {
-  var url = this.api + 'v1/orders/' + orderId
+  // Requires API_KEY
+  var path = '/orders/' + orderId
 
-  if (this.secret !== '') {
-    url += '?api_key=' + this.secret
-  } else {
+  if (this.secret === '') {
     var err = {}
     responseHandler.invalidRequest(err, 'InvalidRequest:ApiKeyRequired', null)
     return callback(err.json, null)
   }
 
   http
-  .put(url)
-  .set({'Accept': 'application/json', 'Content-Type': 'application/json'})
+  .put(this.getFullUrl(path))
+  .set(this.headers)
   .send({state: 'canceling'})
   .end(function (error, response) {
     if (error) {

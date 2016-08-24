@@ -7,6 +7,7 @@ exports.orders = function () {
 exports.success = function (args) {
   return {
     success: true,
+    statusCode: args.statusCode,
     order: {
       id: args.order.id,
       type: args.order.type,
@@ -30,6 +31,7 @@ exports.success = function (args) {
 exports.error = function (args) {
   return {
     success: false,
+    statusCode: args.statusCode,
     error_type: args.error_type
   }
 }

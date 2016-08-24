@@ -1,12 +1,13 @@
 'use strict'
 
 exports.currencies = function () {
-  return ['BTC', 'COP', 'CLP']
+  return ['btc', 'cop', 'clp']
 }
 
 exports.success = function (args) {
   return {
     success: true,
+    statusCode: args.statusCode,
     balance: {
       amount: args.balance.amount,
       available_amount: args.balance.available_amount,
@@ -20,6 +21,7 @@ exports.success = function (args) {
 exports.error = function (args) {
   return {
     success: false,
+    statusCode: args.statusCode,
     error_type: args.error_type
   }
 }

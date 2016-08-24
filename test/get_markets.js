@@ -19,13 +19,13 @@ describe('Surbtc REST Client Get markets', function () {
 
   it('should fail to get markets', function (done) {
     var client = new Client({
-      api: 'https://surbtc.com/api/v1/marketmarket'
+      api: 'https://surbtc.com/api/v1/kuhiuh'
     })
 
     client.getMarkets(function (error, response) {
       assert(error)
       assert(!response)
-      assert.deepEqual(errorFixture(), error)
+      assert.deepEqual(errorFixture(error), error)
       done()
     })
   })

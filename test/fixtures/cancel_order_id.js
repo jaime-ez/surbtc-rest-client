@@ -7,6 +7,7 @@ exports.orders = function () {
 exports.success = function (args) {
   return {
     success: true,
+    statusCode: args.statusCode,
     order: {
       id: args.order.id,
       type: args.order.type,
@@ -31,6 +32,7 @@ exports.error = function (args) {
   if (args.error_type === 'order_not_valid_for_canceling') {
     return {
       success: false,
+      statusCode: args.statusCode,
       order: {
         id: args.order.id,
         type: args.order.type,
@@ -52,6 +54,7 @@ exports.error = function (args) {
   } else {
     return {
       success: false,
+      statusCode: args.statusCode,
       error_type: args.error_type
     }
   }

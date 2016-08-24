@@ -14,7 +14,7 @@ describe('Surbtc REST Client Create and Trade Order', function () {
     async.eachSeries(orders, function (order, callback) {
       it('should create and trade order ' + JSON.stringify(order) + ' in market ' + marketId, function (done) {
         var client = new Client({
-          api: 'https://stg.surbtc.com/api/',
+          api: 'https://stg.surbtc.com/api/v1',
           secret: accountSecret
         })
 
@@ -35,7 +35,7 @@ describe('Surbtc REST Client Create and Trade Order', function () {
     async.eachSeries(orders, function (order, callback) {
       it('should fail to create and trade order ' + JSON.stringify(order) + ' in market ' + marketId, function (done) {
         var client = new Client({
-          api: 'https://stg.surbtc.com/api/',
+          api: 'https://stg.surbtc.com/api/v1',
           secret: 'jhgkjhgk'
         })
 

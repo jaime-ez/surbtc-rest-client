@@ -1,12 +1,13 @@
 'use strict'
 
 exports.markets = function () {
-  return ['BTC-CLP', 'BTC-COP']
+  return ['btc-clp', 'btc-cop']
 }
 
 exports.success = function (args) {
   return {
     success: true,
+    statusCode: args.statusCode,
     orders: args.orders,
     meta: args.meta
   }
@@ -15,6 +16,7 @@ exports.success = function (args) {
 exports.error = function (args) {
   return {
     success: false,
+    statusCode: args.statusCode,
     error_type: args.error_type
   }
 }

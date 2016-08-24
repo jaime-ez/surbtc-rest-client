@@ -30,7 +30,7 @@ describe('Surbtc REST Client Get Order Book', function () {
       client.getOrderBook(marketId, function (error, response) {
         assert(error)
         assert(!response)
-        assert.deepEqual(errorFixture(), error)
+        assert.deepEqual(errorFixture(error), error)
         done()
       })
     })
