@@ -119,8 +119,8 @@ Response:
 
 Returns the number of BTC satoshis equivalent to `amount` cent of fiat on the `marketId` market.
 
-- type=ask => BTC satoshis I would get for `amount` fiat cents
-- type=bid => BTC satoshis I have to pay to get `amount` fiat cents
+- type=ask => BTC satoshis I have to pay to get `amount` fiat cents
+- type=bid => BTC satoshis I would get for `amount` fiat cents
 
 - marketId: string - required
 - type: string - required
