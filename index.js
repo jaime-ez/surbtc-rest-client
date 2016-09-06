@@ -5,6 +5,7 @@ var uuid = require('node-uuid')
 var http = require('superagent')
 var _ = require('lodash')
 var responseHandler = require('./lib/response_handler')
+var colombiaBanks = require('./lib/banks').colombia
 
 function Client (options) {
   this.api = options.api || 'https://surbtc.com/api/v1'
@@ -386,6 +387,46 @@ Client.prototype.createAndTradeOrder = function (marketId, order, callback) {
       self.pollOrderState(createdOrder, 'traded', next)
     }
   ], callback)
+}
+
+Client.prototype.registerBankAccount = function (opts, callback) {
+  var currency = _.toUpper(opts.bank_currency)
+
+  var path = '/fiat_accounts/' + currency
+
+  // get bank id
+  var bankId = _.find(colombiaBanks, {name: opts.bank_name}).id
+
+  var surbtcOpts = {
+    email: opts.email,
+    phone: opts.phone,
+    document_number: opts.bank_account_holder_id,
+    full_name: opts.bank_account_holder_name,
+    account_number: opts.bank_account_number,
+    account_type: opts.bank_account_type,
+    bank_id: bankId
+  }
+
+  // Requires API_KEY
+  if (this.secret === '') {
+    var err = {}
+    responseHandler.invalidRequest(err, 'InvalidRequest:ApiKeyRequired', null)
+    return callback(err.json, null)
+  }
+
+  http
+  .put(this.getFullUrl(path))
+  .send(surbtcOpts)
+  .set(this.headers)
+  .end(function (error, response) {
+    if (error) {
+      console.log(error)
+      responseHandler.errorSet(error, error.response.error)
+      return callback(error.json, null)
+    }
+    responseHandler.success(response, response.body)
+    callback(null, response.json)
+  })
 }
 
 module.exports = Client
