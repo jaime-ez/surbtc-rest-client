@@ -306,6 +306,42 @@ Response:
         }
       }
 
+### registerBankAccount  
+
+    var opts = {
+      bank_name: 'Banco Santander',
+      bank_account_holder_name: 'jaime echegaray',
+      bank_account_holder_id: '157715003',
+      bank_account_type: 'Cuenta Corriente',
+      bank_account_number: 123456,
+      bank_currency: 'cop',
+      email: '',
+      phone: ''
+    }
+    
+    client.registerBankAccount(opts, function(err, res){
+
+    })
+
+Response:
+
+    { success: true,
+      fiat_account: 
+       { id: 943,
+         account_number: '123456',
+         account_type: 'Cuenta Corriente',
+         bank_id: 56,
+         created_at: '2016-09-06T18:13:16.864Z',
+         currency: 'COP',
+         document_number: '157715003',
+         email: '',
+         full_name: 'jaime echegaray',
+         national_number_identifier: null,
+         phone: '',
+         updated_at: '2016-09-06T18:13:16.864Z',
+         bank_name: 'Banco Santander' },
+      statusCode: 200 }
+
 ## To Do:
 
 ### Should we promisify or promisifyAll this?
