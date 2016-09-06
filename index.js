@@ -420,7 +420,6 @@ Client.prototype.registerBankAccount = function (opts, callback) {
   .set(this.headers)
   .end(function (error, response) {
     if (error) {
-      console.log(error)
       responseHandler.errorSet(error, error.response.error)
       return callback(error.json, null)
     }
