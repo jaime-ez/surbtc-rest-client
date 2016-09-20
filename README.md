@@ -83,10 +83,10 @@ Response:
 
 #### Get Quotation
 
-Returns the number of fiat cents equivalent to `amount` BTC satoshis on the `marketId` market.
+Returns the number of fiat equivalent to `amount` BTC on the `marketId` market.
 
-- type=ask => fiat cents that I would get for `amount` satoshis
-- type=bid => fiat cents I have to pay to get `amount` satoshis
+- type=ask => fiat amount that I would get for `amount` BTC
+- type=bid => fiat amount I have to pay to get `amount` BTC
 
 - marketId: string - required
 - type: string - required
@@ -117,10 +117,10 @@ Response:
 
 #### Get Reverse Quotation
 
-Returns the number of BTC satoshis equivalent to `amount` cent of fiat on the `marketId` market.
+Returns the number of BTC equivalent to `amount` of fiat on the `marketId` market.
 
-- type=ask => BTC satoshis I have to pay to get `amount` fiat cents
-- type=bid => BTC satoshis I would get for `amount` fiat cents
+- type=ask => BTC I have to pay to get `amount` fiat
+- type=bid => BTC I would get for `amount` fiat
 
 - marketId: string - required
 - type: string - required
