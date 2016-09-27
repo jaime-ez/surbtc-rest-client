@@ -25,7 +25,7 @@ Client.prototype._getFullUrl = function (path) {
   return this.api + path
 }
 
-Client.prototype._getHmac = function (timestamp, method, path, data) {
+Client.prototype._getHmac = function (nonce, method, path, data) {
   // Returns a HMAC based on surBTC auth scheme to be
   // used to build headers when auth is required
 
@@ -33,10 +33,10 @@ Client.prototype._getHmac = function (timestamp, method, path, data) {
   var message = ''
 
   if (method === 'GET') {
-    message = 'GET' + ' ' + fullPath + ' ' + timestamp
+    message = 'GET' + ' ' + fullPath + ' ' + nonce
   } else if (method === 'POST' || method === 'PUT') {
     var encodedData = new Buffer(JSON.stringify(data)).toString('base64')
-    message = method + ' ' + fullPath + ' ' + encodedData + ' ' + timestamp
+    message = method + ' ' + fullPath + ' ' + encodedData + ' ' + nonce
   } else {
     console.error('Authentication for ' + method + ' is not implemented')
     return
@@ -400,10 +400,12 @@ Client.prototype.cancelOrderId = function (orderId, callback) {
     return callback(err.json, null)
   }
 
+  var data = { state: 'canceling' }
+
   http
   .put(this._getFullUrl(path))
-  .set(this._getAuthHeaders('GET', path))
-  .send({state: 'canceling'})
+  .set(this._getAuthHeaders('PUT', path, data))
+  .send(data)
   .end(function (error, response) {
     if (error) {
       responseHandler.errorSet(error, error.response.error)
