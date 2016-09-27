@@ -2,7 +2,9 @@
 
 var Client = require('../')
 var assert = require('chai').assert
-var accountSecret = require('./fixtures/account_info').secret()
+var accountSecret = require('./fixtures/account_info').secret
+var accountKey = require('./fixtures/account_info').key
+
 var errorFixture = require('./fixtures/get_orders').error
 var success = require('./fixtures/get_orders').success
 var markets = require('./fixtures/get_orders').markets()
@@ -13,7 +15,8 @@ describe('Surbtc REST Client Get Orders', function () {
     it('should get orders for market ' + marketId, function (done) {
       var client = new Client({
         api: 'https://stg.surbtc.com/api/v1',
-        secret: accountSecret
+        key: accountKey,
+          secret: accountSecret
       })
 
       client.getOrders(marketId, function (error, response) {

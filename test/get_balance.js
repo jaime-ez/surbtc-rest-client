@@ -5,7 +5,9 @@ var assert = require('chai').assert
 var errorFixture = require('./fixtures/get_balance').error
 var success = require('./fixtures/get_balance').success
 var currencies = require('./fixtures/get_balance').currencies()
-var accountSecret = require('./fixtures/account_info').secret()
+var accountSecret = require('./fixtures/account_info').secret
+var accountKey = require('./fixtures/account_info').key
+
 var async = require('async')
 
 describe('Surbtc REST Client Get Balance', function () {
@@ -13,7 +15,8 @@ describe('Surbtc REST Client Get Balance', function () {
     it('should get Balance for currency ' + currency, function (done) {
       var client = new Client({
         api: 'https://stg.surbtc.com/api/v1',
-        secret: accountSecret
+        key: accountKey,
+          secret: accountSecret
       })
 
       client.getBalances(currency, function (error, response) {

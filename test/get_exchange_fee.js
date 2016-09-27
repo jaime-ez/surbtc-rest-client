@@ -2,7 +2,9 @@
 
 var Client = require('../')
 var assert = require('chai').assert
-var accountSecret = require('./fixtures/account_info').secret()
+var accountSecret = require('./fixtures/account_info').secret
+var accountKey = require('./fixtures/account_info').key
+
 var errorFixture = require('./fixtures/get_exchange_fee').error
 var success = require('./fixtures/get_exchange_fee').success
 var types = require('./fixtures/get_exchange_fee').types()
@@ -15,6 +17,7 @@ describe('Surbtc REST Client Get Exchange Fee', function () {
       it('should get exchange fee for limit order type ' + type + ' in market ' + marketId, function (done) {
         var client = new Client({
           api: 'https://stg.surbtc.com/api/v1',
+          key: accountKey,
           secret: accountSecret
         })
 
@@ -30,6 +33,7 @@ describe('Surbtc REST Client Get Exchange Fee', function () {
       it('should get exchange fee for market_order order type ' + type + ' in market ' + marketId, function (done) {
         var client = new Client({
           api: 'https://stg.surbtc.com/api/v1',
+          key: accountKey,
           secret: accountSecret
         })
 
