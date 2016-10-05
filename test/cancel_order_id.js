@@ -16,7 +16,7 @@ describe('Surbtc REST Client Cancel Order Id', function () {
       var client = new Client({
         api: 'https://stg.surbtc.com/api/v1',
         key: accountKey,
-          secret: accountSecret
+        secret: accountSecret
       })
 
       client.cancelOrderId(orderId, function (error, response) {
