@@ -2,17 +2,18 @@
 
 var crypto = require('crypto')
 var url = require('url')
-
 var async = require('async')
 var uuid = require('node-uuid')
 var http = require('superagent')
 var _ = require('lodash')
+require('bitcoin-math')
+var bitcoinAddress = require('bitcoin-address')
 
 var responseHandler = require('./lib/response_handler')
 var colombiaBanks = require('./lib/banks').colombia
 
 function Client (options) {
-  this.api = options.api || 'https://surbtc.com/api/v1'
+  this.api = options.api || 'https://www.surbtc.com/api/v1'
   this.key = options.key || ''
   this.secret = options.secret || ''
   this.params = options.params || {}
@@ -453,7 +454,7 @@ Client.prototype.registerBankAccount = function (opts, callback) {
     bank_id: bankId
   }
 
-  // Requires API_KEY
+  // Requires auth
   if (this.secret === '') {
     var err = {}
     responseHandler.invalidRequest(err, 'InvalidRequest:ApiKeyRequired', null)
@@ -466,6 +467,59 @@ Client.prototype.registerBankAccount = function (opts, callback) {
   .send(surbtcOpts)
   .end(function (error, response) {
     if (error) {
+      responseHandler.errorSet(error, error.response.error)
+      return callback(error.json, null)
+    }
+    responseHandler.success(response, response.body)
+    callback(null, response.json)
+  })
+}
+
+Client.prototype.requestWithdrawal = function (opts, callback) {
+  var path = '/withdrawals'
+
+  opts.currency = _.toUpper(opts.currency)
+
+  var withdrawalOpts = {
+    withdrawal_data: {},
+    amount: 0,
+    currency: opts.currency
+  }
+
+  if (opts.currency === 'BTC') {
+    console.log('testnet', bitcoinAddress.validate(opts.target_address, 'testnet'))
+    console.log('prod', bitcoinAddress.validate(opts.target_address, 'prod'))
+    // validate target address
+    if ((this.api.indexOf('stg') > 0 && !bitcoinAddress.validate(opts.target_address, 'testnet')) ||
+       (this.api.indexOf('stg') < 0 && !bitcoinAddress.validate(opts.target_address, 'prod'))) {
+      var err1 = {}
+      responseHandler.invalidRequest(err1, 'InvalidRequest:InvalidBitcoinAddress', null)
+      return callback(err1.json, null)
+    } else {
+      withdrawalOpts.withdrawal_data.target_address = opts.target_address
+    }
+
+    // BTC to satoshis
+    withdrawalOpts.amount = opts.amount.toSatoshi()
+  } else if (opts.currency === 'CLP' || opts.currency === 'COP') {
+    withdrawalOpts.amount = opts.amount * 100
+  }
+
+  // Requires auth
+  if (this.secret === '') {
+    var err = {}
+    responseHandler.invalidRequest(err, 'InvalidRequest:ApiKeyRequired', null)
+    return callback(err.json, null)
+  }
+
+  http
+  .post(this._getFullUrl(path))
+  .set(this._getAuthHeaders('POST', path, withdrawalOpts))
+  .send(withdrawalOpts)
+  .set(this.headers)
+  .end(function (error, response) {
+    if (error) {
+      console.log(error)
       responseHandler.errorSet(error, error.response.error)
       return callback(error.json, null)
     }
