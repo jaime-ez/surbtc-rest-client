@@ -461,9 +461,9 @@ Client.prototype.registerBankAccount = function (opts, callback) {
   }
 
   http
-  .put(this.getFullUrl(path))
+  .put(this._getFullUrl(path))
+  .set(this._getAuthHeaders('PUT', path, surbtcOpts))
   .send(surbtcOpts)
-  .set(this.headers)
   .end(function (error, response) {
     if (error) {
       responseHandler.errorSet(error, error.response.error)
