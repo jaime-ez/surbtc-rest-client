@@ -532,7 +532,7 @@ Client.prototype.registerDeposit = function (opts, callback) {
 
   var depositOpts = {
     amount: opts.amount * 100,
-    currency: opts.currency
+    currency: _.toUpper(opts.currency)
   }
 
   // Requires auth
