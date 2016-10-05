@@ -487,8 +487,6 @@ Client.prototype.requestWithdrawal = function (opts, callback) {
   }
 
   if (opts.currency === 'BTC') {
-    console.log('testnet', bitcoinAddress.validate(opts.target_address, 'testnet'))
-    console.log('prod', bitcoinAddress.validate(opts.target_address, 'prod'))
     // validate target address
     if ((this.api.indexOf('stg') > 0 && !bitcoinAddress.validate(opts.target_address, 'testnet')) ||
        (this.api.indexOf('stg') < 0 && !bitcoinAddress.validate(opts.target_address, 'prod'))) {
@@ -518,7 +516,6 @@ Client.prototype.requestWithdrawal = function (opts, callback) {
   .send(withdrawalOpts)
   .end(function (error, response) {
     if (error) {
-      console.log(error)
       responseHandler.errorSet(error, error.response.error)
       return callback(error.json, null)
     }
@@ -548,7 +545,6 @@ Client.prototype.registerDeposit = function (opts, callback) {
   .send(depositOpts)
   .end(function (error, response) {
     if (error) {
-      console.log(error)
       responseHandler.errorSet(error, error.response.error)
       return callback(error.json, null)
     }
