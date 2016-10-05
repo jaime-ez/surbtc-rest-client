@@ -516,7 +516,36 @@ Client.prototype.requestWithdrawal = function (opts, callback) {
   .post(this._getFullUrl(path))
   .set(this._getAuthHeaders('POST', path, withdrawalOpts))
   .send(withdrawalOpts)
-  .set(this.headers)
+  .end(function (error, response) {
+    if (error) {
+      console.log(error)
+      responseHandler.errorSet(error, error.response.error)
+      return callback(error.json, null)
+    }
+    responseHandler.success(response, response.body)
+    callback(null, response.json)
+  })
+}
+
+Client.prototype.registerDeposit = function (opts, callback) {
+  var path = '/deposits'
+
+  var depositOpts = {
+    amount: opts.amount * 100,
+    currency: opts.currency
+  }
+
+  // Requires auth
+  if (this.secret === '') {
+    var err = {}
+    responseHandler.invalidRequest(err, 'InvalidRequest:ApiKeyRequired', null)
+    return callback(err.json, null)
+  }
+
+  http
+  .post(this._getFullUrl(path))
+  .set(this._getAuthHeaders('POST', path, depositOpts))
+  .send(depositOpts)
   .end(function (error, response) {
     if (error) {
       console.log(error)
