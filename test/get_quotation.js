@@ -6,7 +6,9 @@ var errorFixture = require('./fixtures/get_quotation').error
 var success = require('./fixtures/get_quotation').success
 var types = require('./fixtures/get_quotation').types()
 var markets = require('./fixtures/get_quotation').markets()
-var accountSecret = require('./fixtures/account_info').secret()
+var accountSecret = require('./fixtures/account_info').secret
+var accountKey = require('./fixtures/account_info').key
+
 var async = require('async')
 var total = 1
 
@@ -16,6 +18,7 @@ describe('Surbtc REST Client Get Quotation', function () {
       it('should get quotation for limit order type ' + type + ' in market ' + marketId + ' for total ' + total, function (done) {
         var client = new Client({
           api: 'https://stg.surbtc.com/api/v1',
+          key: accountKey,
           secret: accountSecret
         })
 

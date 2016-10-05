@@ -1,14 +1,19 @@
 'use strict'
 
+var crypto = require('crypto')
+var url = require('url')
+
 var async = require('async')
 var uuid = require('node-uuid')
 var http = require('superagent')
 var _ = require('lodash')
+
 var responseHandler = require('./lib/response_handler')
 var colombiaBanks = require('./lib/banks').colombia
 
 function Client (options) {
   this.api = options.api || 'https://surbtc.com/api/v1'
+  this.key = options.key || ''
   this.secret = options.secret || ''
   this.params = options.params || {}
   this.headers = options.headers || {
@@ -17,21 +22,55 @@ function Client (options) {
   }
 }
 
-Client.prototype.getFullUrl = function (path) {
-  // FIXME: Don't pass the secret if the method doesn't require it
-  var url = this.api + path
-  if (this.secret !== '') {
-    var paramToken = path.indexOf('?') === -1 ? '?' : '&'
-    return (url + paramToken + 'api_key=' + this.secret)
+Client.prototype._getFullUrl = function (path) {
+  return this.api + path
+}
+
+Client.prototype._getHmac = function (nonce, method, path, data) {
+  // Returns a HMAC based on surBTC auth scheme to be
+  // used to build headers when auth is required
+
+  var fullPath = url.parse(this._getFullUrl(path)).path
+  var message = ''
+
+  if (method === 'GET') {
+    message = 'GET' + ' ' + fullPath + ' ' + nonce
+  } else if (method === 'POST' || method === 'PUT') {
+    var encodedData = new Buffer(JSON.stringify(data)).toString('base64')
+    message = method + ' ' + fullPath + ' ' + encodedData + ' ' + nonce
+  } else {
+    console.error('Authentication for ' + method + ' is not implemented')
+    return
   }
-  return url
+
+  return crypto
+    .createHmac('sha384', this.secret)
+    .update(message)
+    .digest('hex')
+}
+
+Client.prototype._getAuthHeaders = function (method, path, data) {
+  // Returns headers for requests that requires auth
+  var timestamp = new Date().getTime()
+
+  var authHeaders = {
+    'X-SBTC-APIKEY': this.key,
+    'X-SBTC-NONCE': timestamp,
+    'X-SBTC-SIGNATURE': this._getHmac(timestamp, method, path, data)
+  }
+
+  for (var attrname in this.headers) {
+    authHeaders[attrname] = this.headers[attrname]
+  }
+
+  return authHeaders
 }
 
 Client.prototype.getMarkets = function (callback) {
   var path = '/markets'
 
   http
-  .get(this.getFullUrl(path))
+  .get(this._getFullUrl(path))
   .set(this.headers)
   .end(function (error, response) {
     if (error) {
@@ -45,7 +84,7 @@ Client.prototype.getMarkets = function (callback) {
 
 Client.prototype.getBalances = function (currency, callback) {
   var path = '/balances/' + currency
-  // Requires API_KEY
+  // Requires auth
   if (this.secret === '') {
     var err = {}
     responseHandler.invalidRequest(err, 'InvalidRequest:ApiKeyRequired', null)
@@ -53,8 +92,8 @@ Client.prototype.getBalances = function (currency, callback) {
   }
 
   http
-  .get(this.getFullUrl(path))
-  .set(this.headers)
+  .get(this._getFullUrl(path))
+  .set(this._getAuthHeaders('GET', path))
   .end(function (error, response) {
     if (error) {
       responseHandler.errorSet(error, error.response.error)
@@ -66,7 +105,7 @@ Client.prototype.getBalances = function (currency, callback) {
 }
 
 Client.prototype.getExchangeFee = function (marketId, type, marketOrder, callback) {
-  // Requires API_KEY
+  // Requires auth
   type = _.capitalize(type)
 
   var path = '/markets/' + marketId + '/fee_percentage?type=' + type
@@ -86,8 +125,8 @@ Client.prototype.getExchangeFee = function (marketId, type, marketOrder, callbac
   }
 
   http
-  .get(this.getFullUrl(path))
-  .set(this.headers)
+  .get(this._getFullUrl(path))
+  .set(this._getAuthHeaders('GET', path))
   .end(function (error, response) {
     if (error) {
       responseHandler.errorSet(error, error.response.error)
@@ -106,7 +145,7 @@ Client.prototype.getOrderBook = function (marketId, callback) {
   var path = '/markets/' + marketId + '/order_book'
 
   http
-  .get(this.getFullUrl(path))
+  .get(this._getFullUrl(path))
   .set(this.headers)
   .end(function (error, response) {
     if (error) {
@@ -119,7 +158,7 @@ Client.prototype.getOrderBook = function (marketId, callback) {
 }
 
 Client.prototype.getQuotation = function (marketId, type, amount, callback) {
-  // Requires API_KEY
+  // Requires auth
   type = _.lowerCase(type)
 
   var path = '/markets/' + marketId + '/quotations'
@@ -130,16 +169,18 @@ Client.prototype.getQuotation = function (marketId, type, amount, callback) {
     return callback(err.json, null)
   }
 
-  http
-  .post(this.getFullUrl(path))
-  .send({
+  var data = {
     quotation: {
       type: type,
       reverse: false,
       amount: amount
     }
-  })
-  .set(this.headers)
+  }
+
+  http
+  .post(this._getFullUrl(path))
+  .send(data)
+  .set(this._getAuthHeaders('POST', path, data))
   .end(function (error, response) {
     if (error) {
       responseHandler.errorSet(error, error.response.error)
@@ -151,7 +192,7 @@ Client.prototype.getQuotation = function (marketId, type, amount, callback) {
 }
 
 Client.prototype.getReverseQuotation = function (marketId, type, amount, callback) {
-  // Requires API_KEY
+  // Requires auth
   type = _.lowerCase(type)
 
   var path = '/markets/' + marketId + '/quotations'
@@ -162,16 +203,18 @@ Client.prototype.getReverseQuotation = function (marketId, type, amount, callbac
     return callback(err.json, null)
   }
 
-  http
-  .post(this.getFullUrl(path))
-  .send({
+  var data = {
     quotation: {
       type: type,
       reverse: true,
       amount: amount
     }
-  })
-  .set(this.headers)
+  }
+
+  http
+  .post(this._getFullUrl(path))
+  .send(data)
+  .set(this._getAuthHeaders('POST', path, data))
   .end(function (error, response) {
     if (error) {
       responseHandler.errorSet(error, error.response.error)
@@ -183,7 +226,7 @@ Client.prototype.getReverseQuotation = function (marketId, type, amount, callbac
 }
 
 Client.prototype.createOrder = function (marketId, order, callback) {
-  // Requires API_KEY
+  // Requires auth
   var path = '/markets/' + marketId + '/orders'
 
   if (this.secret === '') {
@@ -191,9 +234,10 @@ Client.prototype.createOrder = function (marketId, order, callback) {
     responseHandler.invalidRequest(err, 'InvalidRequest:ApiKeyRequired', null)
     return callback(err.json, null)
   }
+
   http
-  .post(this.getFullUrl(path))
-  .set(this.headers)
+  .post(this._getFullUrl(path))
+  .set(this._getAuthHeaders('POST', path, order))
   .send(order)
   .end(function (error, response) {
     if (error) {
@@ -272,7 +316,7 @@ Client.prototype.pollOrderState = function (order, status, callback) {
 }
 
 Client.prototype.getOrdersRaw = function (marketId, page, callback) {
-  // Requires API_KEY
+  // Requires auth
   var path = '/markets/' + marketId + '/orders'
 
   if (this.secret === '') {
@@ -286,8 +330,8 @@ Client.prototype.getOrdersRaw = function (marketId, page, callback) {
   }
 
   http
-  .get(this.getFullUrl(path))
-  .set(this.headers)
+  .get(this._getFullUrl(path))
+  .set(this._getAuthHeaders('GET', path))
   .end(function (error, response) {
     if (error) {
       responseHandler.errorSet(error, error.response.error)
@@ -325,7 +369,7 @@ Client.prototype.getOrdersByState = function (marketId, state, callback) {
 }
 
 Client.prototype.getOrderId = function (orderId, callback) {
-  // Requires API_KEY
+  // Requires auth
   var path = '/orders/' + orderId
 
   if (this.secret === '') {
@@ -335,8 +379,8 @@ Client.prototype.getOrderId = function (orderId, callback) {
   }
 
   http
-  .get(this.getFullUrl(path))
-  .set(this.headers)
+  .get(this._getFullUrl(path))
+  .set(this._getAuthHeaders('GET', path))
   .end(function (error, response) {
     if (error) {
       responseHandler.errorSet(error, error.response.error)
@@ -348,7 +392,7 @@ Client.prototype.getOrderId = function (orderId, callback) {
 }
 
 Client.prototype.cancelOrderId = function (orderId, callback) {
-  // Requires API_KEY
+  // Requires auth
   var path = '/orders/' + orderId
 
   if (this.secret === '') {
@@ -357,10 +401,12 @@ Client.prototype.cancelOrderId = function (orderId, callback) {
     return callback(err.json, null)
   }
 
+  var data = { state: 'canceling' }
+
   http
-  .put(this.getFullUrl(path))
-  .set(this.headers)
-  .send({state: 'canceling'})
+  .put(this._getFullUrl(path))
+  .set(this._getAuthHeaders('PUT', path, data))
+  .send(data)
   .end(function (error, response) {
     if (error) {
       responseHandler.errorSet(error, error.response.error)

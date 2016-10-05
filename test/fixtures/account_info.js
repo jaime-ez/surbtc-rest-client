@@ -1,5 +1,4 @@
 'use strict'
 
-exports.secret = function () {
-  return 'a061fc555331d1285a89b012676d6e7c'
-}
+exports.secret = 'j1ZkqENlqzImGp4J6haFIobSHep5y8yLpVQqePOd'
+exports.key = 'd55c063592539b39b12c734b024ba9d9'
