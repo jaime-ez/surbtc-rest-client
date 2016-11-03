@@ -23,6 +23,8 @@
   },
   "dependencies": {
     "async": "^2.0.1",
+    "bitcoin-address": "^0.3.0",
+    "bitcoin-math": "^0.2.0",
     "lodash": "^4.14.0",
     "node-uuid": "^1.4.7",
     "superagent": "^2.1.0"

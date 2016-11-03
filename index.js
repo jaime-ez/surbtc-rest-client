@@ -2,16 +2,18 @@
 
 var crypto = require('crypto')
 var url = require('url')
-
 var async = require('async')
 var uuid = require('node-uuid')
 var http = require('superagent')
 var _ = require('lodash')
+require('bitcoin-math')
+var bitcoinAddress = require('bitcoin-address')
 
 var responseHandler = require('./lib/response_handler')
+var colombiaBanks = require('./lib/banks').colombia
 
 function Client (options) {
-  this.api = options.api || 'https://surbtc.com/api/v1'
+  this.api = options.api || 'https://www.surbtc.com/api/v1'
   this.key = options.key || ''
   this.secret = options.secret || ''
   this.params = options.params || {}
@@ -432,6 +434,123 @@ Client.prototype.createAndTradeOrder = function (marketId, order, callback) {
       self.pollOrderState(createdOrder, 'traded', next)
     }
   ], callback)
+}
+
+Client.prototype.registerBankAccount = function (opts, callback) {
+  var currency = _.toUpper(opts.bank_currency)
+
+  var path = '/fiat_accounts/' + currency
+
+  // get bank id
+  var bankId = _.find(colombiaBanks, {name: opts.bank_name}).id
+
+  var surbtcOpts = {
+    email: opts.email,
+    phone: opts.phone,
+    document_number: opts.bank_account_holder_id,
+    full_name: opts.bank_account_holder_name,
+    account_number: opts.bank_account_number,
+    account_type: opts.bank_account_type,
+    bank_id: bankId
+  }
+
+  // Requires auth
+  if (this.secret === '') {
+    var err = {}
+    responseHandler.invalidRequest(err, 'InvalidRequest:ApiKeyRequired', null)
+    return callback(err.json, null)
+  }
+
+  http
+  .put(this._getFullUrl(path))
+  .set(this._getAuthHeaders('PUT', path, surbtcOpts))
+  .send(surbtcOpts)
+  .end(function (error, response) {
+    if (error) {
+      responseHandler.errorSet(error, error.response.error)
+      return callback(error.json, null)
+    }
+    responseHandler.success(response, response.body)
+    callback(null, response.json)
+  })
+}
+
+Client.prototype.requestWithdrawal = function (opts, callback) {
+  var path = '/withdrawals'
+
+  opts.currency = _.toUpper(opts.currency)
+
+  var withdrawalOpts = {
+    withdrawal_data: {},
+    amount: 0,
+    currency: opts.currency
+  }
+
+  if (opts.currency === 'BTC') {
+    // validate target address
+    if ((this.api.indexOf('stg') > 0 && !bitcoinAddress.validate(opts.target_address, 'testnet')) ||
+       (this.api.indexOf('stg') < 0 && !bitcoinAddress.validate(opts.target_address, 'prod'))) {
+      var err1 = {}
+      responseHandler.invalidRequest(err1, 'InvalidRequest:InvalidBitcoinAddress', null)
+      return callback(err1.json, null)
+    } else {
+      withdrawalOpts.withdrawal_data.target_address = opts.target_address
+    }
+
+    // BTC to satoshis
+    withdrawalOpts.amount = opts.amount.toSatoshi()
+  } else if (opts.currency === 'CLP' || opts.currency === 'COP') {
+    withdrawalOpts.amount = opts.amount * 100
+  }
+
+  // Requires auth
+  if (this.secret === '') {
+    var err = {}
+    responseHandler.invalidRequest(err, 'InvalidRequest:ApiKeyRequired', null)
+    return callback(err.json, null)
+  }
+
+  http
+  .post(this._getFullUrl(path))
+  .set(this._getAuthHeaders('POST', path, withdrawalOpts))
+  .send(withdrawalOpts)
+  .end(function (error, response) {
+    if (error) {
+      responseHandler.errorSet(error, error.response.error)
+      return callback(error.json, null)
+    }
+    responseHandler.success(response, response.body)
+    callback(null, response.json)
+  })
+}
+
+Client.prototype.registerDeposit = function (opts, callback) {
+  var path = '/deposits'
+
+  var depositOpts = {
+    amount: opts.amount * 100,
+    currency: _.toUpper(opts.currency)
+  }
+
+  // Requires auth
+  if (this.secret === '') {
+    var err = {}
+    responseHandler.invalidRequest(err, 'InvalidRequest:ApiKeyRequired', null)
+    return callback(err.json, null)
+  }
+
+  http
+  .post(this._getFullUrl(path))
+  .set(this._getAuthHeaders('POST', path, depositOpts))
+  .send(depositOpts)
+  .end(function (error, response) {
+    if (error) {
+      responseHandler.errorSet(error, error.response.error)
+      return callback(error.json, null)
+    }
+    responseHandler.success(response, response.body)
+    callback(null, response.json)
+  })
 }
 
 module.exports = Client
