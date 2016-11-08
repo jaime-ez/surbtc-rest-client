@@ -400,11 +400,6 @@ Response:
 
 ## To Do:
 
-### Should we promisify or promisifyAll this?
-
-http://bluebirdjs.com/docs/api/promise.promisify.html
-http://bluebirdjs.com/docs/api/promise.promisifyall.html
-
 ### createAndTradeOrder
 
 Should cancel order if not traded after X seconds?
